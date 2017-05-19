@@ -6,6 +6,7 @@
 
 MAX6675 ktc(ktcCLK, ktcCS, ktcSO);
 
+// pin Arduino associati ai display
 #define a       9
 #define b       11
 #define c       12
@@ -19,6 +20,7 @@ MAX6675 ktc(ktcCLK, ktcCS, ktcSO);
 #define dec   4
 #define uni   5
 
+// Matrice contenente le informazioni per mostrare tutte le cifre del codice esadecimale piu alcuni caratteri speciali
 byte seven_seg_digits[][7] = { { 1, 1, 1, 1, 1, 1, 0 }, // = 0
   { 0, 1, 1, 0, 0, 0, 0 }, // = 1
   { 1, 1, 0, 1, 1, 0, 1 }, // = 2
@@ -39,6 +41,7 @@ byte seven_seg_digits[][7] = { { 1, 1, 1, 1, 1, 1, 0 }, // = 0
   { 0, 0, 0, 0, 0, 0, 1 }  // = -
 };
 
+// pin dei display sette segmenti
 byte sevSeg[7] = {a, b, c, d, e, f, g};
 
 byte digitPin[4] = {uni, dec, cen, mig};
@@ -50,6 +53,7 @@ void setup() {
   pinMode(dec, OUTPUT);
   pinMode(cen, OUTPUT);
   pinMode(mig, OUTPUT);
+  // imposta i pin per pilotare il display come uscite
   for (int j = 0; j < (sizeof(sevSeg) / sizeof(sevSeg[0])); j++) pinMode(sevSeg[j], OUTPUT);
   delay(200);
   Serial.begin(9600);
@@ -60,12 +64,14 @@ void loop() {
   Serial.print(num++);
   Serial.print(": \t");
   
+  // lettura dalla termocoppia
   float temp = ktc.readCelsius();
   
   Serial.print("Deg C = ");
   Serial.print(temp);
   Serial.print("\n");
   
+  // separazione della temperatura letta in migliaia, centinaia decine ed unita
   uint8_t thousends = temp / 1000;
   temp = temp - thousends * 1000;
 
@@ -75,6 +81,7 @@ void loop() {
   uint8_t tens = temp / 10;
   uint8_t ones = temp - tens * 10;
   
+  // se non viene letta nessuna cifra nelle centinaia e/o migliaia allora imposta un carattere vuoto (NULL)
   if (thousends == 0) {
     thousends = 16;
     if (hundreds == 0) {
@@ -84,7 +91,8 @@ void loop() {
   }
   
   uint8_t temperature[4] = {ones, tens, hundreds, thousends};
-
+  
+  // scrivi le cifre sul display
   for (uint8_t y = 0; y < 50; y++) {
     for (byte digit = 0; digit < 4; digit++) {
       digitalWrite(digitPin[digit], LOW);
@@ -96,6 +104,7 @@ void loop() {
   
 }
 
+// funzione per iterare le cifre e mostrarle sul display
 void sevenSegWrite(byte num) {
   for (byte segCount = 0; segCount < 7; ++segCount) {
     digitalWrite(sevSeg[segCount], seven_seg_digits[num][segCount]);
