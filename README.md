@@ -1,6 +1,6 @@
 # Termocoppia MAX 6675 con Arduino
 
-Questo codice server per pilotare 4 display sette segmenti in maniera indipendente
+Questo codice serve per pilotare 4 display sette segmenti in maniera indipendente
 e risucire a mostrare le cifre dalle migliaia alle unita in maniera indipendente,
 cosi da riuscire a nascondere ad esempio le centinaia o le migliaia quando non ci
 sono cifre significative da mostrare.
